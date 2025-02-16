@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from argparse import ArgumentParser
+import os
 import subprocess
 import sys
 from tempfile import NamedTemporaryFile
@@ -171,13 +172,45 @@ def stitch_audio(voicebank_wordlist: list[list[str]],
     return audio
 
 
+expected_voicebank_samples = map(lambda name: name+'.wav', '''
+     a  i  u  e  o
+    ka ki ku ke ko
+    sa si su se so
+    ta ti tu te to
+    na ni nu ne no
+    ha hi hu he ho
+    ma mi mu me mo
+    ya    yu    yo
+    ra ri ru re ro
+    wa          wo    nn
+
+    ga gi gu ge go
+    za zi zu ze zo
+    da di du de do
+    ba bi bu be bo
+    pa pi pu pe po
+    
+    0 1 2 3 4 5 6 7 8 9
+    
+    A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+    '''.split())
+
+
+def list_missing_voicebank_samples(voicebank_path):    
+    missing = []
+    for sample in expected_voicebank_samples:
+        if not os.path.isfile(f'{voicebank_path}/{sample}'):
+            missing.append(sample)
+    
+    return missing
+
+
 def cli(args):
     from config import (
         CLIP_SYLLABLES_BY_MS, SPACE_WORDS_BY_MS, SPACE_LINES_BY_MS,
         SPACE_END_BY_MS, SUPPLEMENTAL_DICT, DEFAULT_VOICEBANK, PHONEMIZER_MODEL
     )
 
-    phonemize = phonemizer(PHONEMIZER_MODEL, SUPPLEMENTAL_DICT)
 
     interactive = sys.stdin.isatty()
 
@@ -190,6 +223,24 @@ def cli(args):
         else:
             print('no --out specified')
             return
+    
+
+    if not os.path.isdir(DEFAULT_VOICEBANK):
+        print(f'no voicebank at {DEFAULT_VOICEBANK}')
+        return
+    
+    missing = list_missing_voicebank_samples(DEFAULT_VOICEBANK)
+    if missing != []:
+        for sample in missing:
+            print(f'missing {DEFAULT_VOICEBANK}/{sample}')
+        return
+
+    if not os.path.isfile(PHONEMIZER_MODEL):
+        print(f'missing phonemizer model at {PHONEMIZER_MODEL}')
+        return
+        
+    phonemize = phonemizer(PHONEMIZER_MODEL, SUPPLEMENTAL_DICT)
+
 
     # non-interactive outputs the whole text at once
     # so should initialize the audio just once before the loop starts
