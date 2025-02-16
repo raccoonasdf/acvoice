@@ -1,0 +1,4 @@
+torch ~= 2.5, < 2.6
+deep-phonemizer ~= 0.0.19
+parsy ~= 2.1
+pydub ~= 0.25

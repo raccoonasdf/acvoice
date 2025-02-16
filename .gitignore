@@ -1,0 +1,7 @@
+/*.wav
+/*.pt
+
+voices/
+voices_untitled/
+
+__pycache__
