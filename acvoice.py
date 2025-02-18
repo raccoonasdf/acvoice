@@ -56,9 +56,12 @@ def word_end(c: str):
 def parse_phonemes(ipa: str):
     pvowel = (
         string('ɒː').result('a')
+        | string('əɹ').result('a')
         # sample overrides for if i ever make bare schwa contextual
         #| string('əː').result('a')
         #| (string('ə') << eof).result('a')
+
+        | string('eɪ').result('e')
 
         #| string('ɔː').result('o') # oa?
         | string('əʊ').result('o')
@@ -238,7 +241,7 @@ def cli(args):
     if not os.path.isfile(PHONEMIZER_MODEL):
         print(f'missing phonemizer model at {PHONEMIZER_MODEL}')
         return
-        
+
     phonemize = phonemizer(PHONEMIZER_MODEL, SUPPLEMENTAL_DICT)
 
 
