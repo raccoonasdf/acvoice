@@ -288,7 +288,7 @@ def cli(args):
             print(f'unexpected {res[e.index]} at index {e.index}')
             continue
 
-        parsed_str = ' '.join(''.join(word) for word in parsed)
+        parsed_str = ' '.join('-'.join(word) for word in parsed)
         print(parsed_str)
 
         # interactive outputs line-by-line
