@@ -162,15 +162,17 @@ def parse_phonemes(ipa: str):
 def stitch_audio(voicebank_wordlist: list[list[str]],
                  voicebank_path,
                  clip_syllables_by_ms=0,
+                 clip_syllables_by_pct=0,
                  space_words_by_ms=0):
     audio = AudioSegment.empty()
 
     for word in voicebank_wordlist:
         for syl in word:
             sample = AudioSegment.from_wav(f'{voicebank_path}/{syl}.wav')
-            audio = audio[:len(audio)-clip_syllables_by_ms] + sample
+            clip = len(sample)*clip_syllables_by_pct+clip_syllables_by_ms
+            audio = audio[:len(audio)-clip] + sample
 
-        audio += AudioSegment.silent(clip_syllables_by_ms+space_words_by_ms)
+        audio += AudioSegment.silent(clip+space_words_by_ms)
 
     return audio
 
